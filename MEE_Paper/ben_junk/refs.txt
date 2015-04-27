@@ -1,0 +1,15 @@
+Thoughts about refs:
+
+* multiple maxima: Bolker 2008, Hilborn and Mangel (Ecological Detective), Etienne et al. (below), Gottesman et al. below (somewhat off-topic, but take a look at their figure S1!)
+* complexity in models: Gelman and Hill 2006 Applied Regression Modeling have a nice discussion/picture; also see the Lavine et al. paper and associated papers (Lele et al. and others)
+* identifiability: Lele et al on data cloning
+* simulated annealing: very commonly used in seed dispersal inverse modeling (Ribbens et al 1994, Green et al 2004 below)
+
+Etienne, Rampal S., Andrew M. Latimer, John A. Silander, and Richard M. Cowling. 2006. “Comment on ‘Neutral Ecological Theory Reveals Isolation and Rapid Speciation in a Biodiversity Hot Spot.’” Science 311 (5761): 610b. doi:10.1126/science.1121914.
+Goffe, William L., Gary D. Ferrier, and John Rogers. 1994. “Global Optimization of Statistical Functions with Simulated Annealing.” Journal of Econometrics 60 (1–2): 65–99. doi:10.1016/0304-4076(94)90038-8.
+Gottesman, William L., Andrew James Reagan, and Peter Sheridan Dodds. 2014. “Collective Philanthropy: Describing and Modeling the Ecology of Giving.” PLoS ONE 9 (7). doi:10.1371/journal.pone.0098876.
+Greene, David F., Charles D. Canham, K. David Coates, and Philip T. Lepage. 2004. “An Evaluation of Alternative Dispersal Functions for Trees.” Journal of Ecology 92 (5): 758–66. doi:10.1111/j.0022-0477.2004.00921.x.
+Lavine, Michael. 2010. “Living Dangerously with Big Fancy models.” Ecology 91 (12): 3487–3487. doi:10.1890/10-1124.1.
+Lele, Subhash R., Khurram Nadeem, and Byron Schmuland. 2010. “Estimability and Likelihood Inference for Generalized Linear Mixed Models Using Data Cloning.” Journal of the American Statistical Association 105 (492): 1617–25. doi:10.1198/jasa.2010.tm09757.
+Ribbens, Eric, John A. Silander, and Stephen W. Pacala. 1994. “Seedling Recruitment in Forests: Calibrating Models to Predict Patterns of Tree Seedling Dispersion.” Ecology 75 (6): 1794. doi:10.2307/1939638.
+
