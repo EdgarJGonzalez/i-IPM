@@ -1,0 +1,16 @@
+We know that if we set the intercept equal to the mean $x$ in a
+linear model, that we completely get rid of the correlation;
+```{r}
+set.seed(1001)
+x <- runif(100)
+y <- rpois(100,2+4*x)
+g1 <- glm(y~I(x-mean(x)),family=poisson)
+cov2cor(vcov(g1))  ## -0.3 correlation
+```
+
+Then the question is: can we do some kind of approximate
+calculation to figure out how we can reparameterize to
+get rid of the correlation?
+
+
+
