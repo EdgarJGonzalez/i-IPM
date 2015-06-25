@@ -1,2 +1,2 @@
-# i-IPM
-Inverse IPM project
+# IIPM
+Integrated IPM project
