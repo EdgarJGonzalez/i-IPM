@@ -179,23 +179,20 @@ modS1 <- glmer(Survival ~ poly(log.Size,2) + (1|Year), family = binomial,
 # plots modS0
 {
  # fitting
- x <- seq(min(data$log.Size, na.rm = T), max(data$log.Size, na.rm = T), 0.1)
- S0.hist <- hist(data.s$log.Size[which(data.s$Survival == 0)], plot = F)
- S0.counts <- S0.hist$counts
- S0.prob <- S0.counts/length(data.s$Survival)
- barplot(S0.prob, S0.hist$breaks[2]-S0.hist$breaks[1], ylim = c(0, 1), 
-  bty = "l", axes = F, axisnames = F, border = NA)
- S1.hist <- hist(data.s$log.Size[which(data.s$Survival == 1)], plot = F)
- S1.counts <- S1.hist$counts
- S1.prob <- -S1.counts/length(data.s$Survival)
- par(new = T)
- barplot(S1.prob, S1.hist$breaks[2]-S1.hist$breaks[1], ylim = c(-1, 0), 
-  axes = F, axisnames = F, border = NA)
- par(new = T)
- plot(x, predict(modS0, newdata = list(log.Size = x), type = "response"), 
-  type = "l", lwd = 4, bty = "n", xlim = c(min(x), max(x)), ylim = c(0, 1),
-  yaxs = "i", main = "Survival", ylab = "Survival probability", 
-  xlab = "scale(log10(Size))")
+ 
+ data.s0 <- subset(data.s, Survival == 0)
+ counts.0 <- table(data.s0$log.Size)
+ plot(as.numeric(names(counts.0)), rep(0, length(counts.0)), 
+  bty = "n", xlim = c(min(x), max(x)), ylim = c(0, 1), yaxs = "i", 
+  main = "Survival", ylab = "Survival probability", 
+  xlab = "scale(log10(Size1))", col = "grey", pch = 16, 
+  cex =  sqrt(counts.0/pi))
+ data.s1 <- subset(data.s, Survival == 1)
+ counts.1 <- table(data.s1$log.Size)
+ points(as.numeric(names(counts.1)), rep(1, length(counts.1)), col = "grey",
+  pch = 16, cex = sqrt(counts.1/pi))
+ lines(x, predict(modS0, newdata = list(log.Size = x), type = "response"), 
+  lwd = 4)
  get.binCI(S0.counts,S0.counts+S1.counts)
  
  # residuals
@@ -219,25 +216,15 @@ modS1 <- glmer(Survival ~ poly(log.Size,2) + (1|Year), family = binomial,
 # plots modS1
 {
  # fitting
- x <- seq(min(data$log.Size, na.rm = T), max(data$log.Size, na.rm = T), 0.1)
- S0.hist <- hist(data.s$log.Size[which(data.s$Survival == 0)], plot = F)
- S0.counts <- S0.hist$counts
- S0.prob <- S0.counts/length(data.s$Survival)
- barplot(S0.prob, S0.hist$breaks[2]-S0.hist$breaks[1], ylim = c(0, 1), 
-  bty = "l", axes = F, axisnames = F, border = NA)
- S1.hist <- hist(data.s$log.Size[which(data.s$Survival == 1)], plot = F)
- S1.counts <- S1.hist$counts
- S1.prob <- -S1.counts/length(data.s$Survival)
- par(new = T)
- barplot(S1.prob, S1.hist$breaks[2]-S1.hist$breaks[1], ylim = c(-1, 0), 
-  axes = F, axisnames = F, border = NA)
- 
- par(new = T)
- plot(x, predict(modS1, newdata = list(log.Size = x), type = "response", 
-  re.form = ~ 0), type = "l", lwd = 4, bty = "n", 
-  xlim = c(min(x), max(x)), ylim = c(0, 1), yaxs = "i", 
+ plot(as.numeric(names(counts.0)), rep(0, length(counts.0)), 
+  bty = "n", xlim = c(min(x), max(x)), ylim = c(0, 1), yaxs = "i", 
   main = "Survival", ylab = "Survival probability", 
-  xlab = "scale(log10(Size))") 
+  xlab = "scale(log10(Size1))", col = "grey", pch = 16, 
+  cex =  sqrt(counts.0/pi))
+ points(as.numeric(names(counts.1)), rep(1, length(counts.1)), col = "grey",
+  pch = 16, cex = sqrt(counts.1/pi))
+ lines(x, predict(modS1, newdata = list(log.Size = x), type = "response", 
+  re.form = ~ 0), lwd = 4)
  coef <- coef(modS1)$Year
  rownames(coef) <- as.numeric(rownames(coef(modS1)$Year))
  poly <- poly(data.s$log.Size,2)
@@ -419,11 +406,14 @@ log10(sigma(modG1)) # -0.2160386
 
 ## Fecundity analysis
 
+# Poisson
+
 modF0 <- glm(Fert ~ log.Size, family = poisson, data = data.f)
 # AIC = 11643
 # (Intercept)     log.Size  
 # -0.328          1.415  
-log10(fixef(modF0)[2]) # 0.1508113 
+log10(fixef(modF0)[2]) # 0.1508113
+
 
 modF1 <- glmer(Fert ~ log.Size + (1|Year),  family = poisson, data = data.f)
 # AIC = 10369.564
@@ -516,6 +506,140 @@ log10(fixef(modF1)[2]) # 0.1518317
   x <- seq(min(subset$log.Size), max(subset$log.Size), 0.1)
   y <- exp(predict(modF1, newdata = list(log.Size = x), re.form = ~ 0) + 
    ranef.year)
+  legend$Year.col[i] <- as.character(subset$Year.col[1])
+  legend$Year.lty[i] <- subset$Year.lty[1]
+  lines(x, y, col = alpha(legend$Year.col[i], 0.5), 
+   lty = legend$Year.lty[i], lwd = 2)
+  #lines(x[-length(x)], y[-length(y)], col = subset$Year.col[1])
+  # arrows(x[length(x)-1], y[length(y)-1], x[length(x)], y[length(y)], 
+  # col = subset$Year.col[1], length = 0.1)
+ }
+ x <- seq(min(data.f$log.Size, na.rm = T), max(data.f$log.Size, na.rm = T), 
+  0.1)
+ lines(x, predict(modF1, newdata = list(log.Size = x), type = "response", 
+  re.form = ~ 0), lwd = 4)  
+ legend <- legend[order(legend$Year),]
+ legend("topleft", legend = c("All",legend[, 1]), col = c("black", 
+  alpha(legend[, 2], 0.5)), lty = c(1, legend[, 3]), bty = "n", 
+  lwd = c(4, rep(2, length(legend$Year))))
+    
+ # residuals
+ residuals <- residuals(modF1, "deviance")
+ data.f <- transform(data.f, sum.res.1 = log.Size+residuals)
+ counts <- table(data.f$sum.res.1)
+ counts.col <- rep(1, dim(data.f)[1])
+ sub.counts <- subset(counts, counts > 1)
+ sum.sub.counts <- round(as.numeric(names(sub.counts)), 6)
+ for (i in 1:length(sum.sub.counts))
+  for (j in 1:dim(data.f)[1])
+   if (round(data.f$sum.res.1[j], 6) == sum.sub.counts[i])
+    counts.col[j] <- sub.counts[i]
+ fitted <- predict(modF1, type = "response")
+ plot(fitted, residuals, col = "grey", ylim = c(-4, 4), 
+  pch = 16, cex =  sqrt(counts.col/pi), bty = "n", 
+  main = "Fecundity model residuals", 
+  xlab = "scale(log10(Size))", ylab = "Deviance residuals")
+ abline(0, 0)
+}
+
+# Neg-binomial
+
+modF0 <- glm.nb(Fert ~ log.Size, data = data.f)
+# AIC = 9517.5
+# (Intercept)   log.Size  
+# -0.4915       1.6483 
+
+modF1 <- glmer.nb(Fert ~ log.Size + (1|Year), data = data.f)
+# AIC = 11860.38
+# Fix effects:
+#  (Intercept)   log.Size  
+#  -0.9241       1.9229  
+# Random effects:
+#  (Intercept)
+#  1997  0.251538742
+#  1998  0.803434142
+#  1999 -0.091840931
+#  2000  0.496705881
+#  2001  0.406750132
+#  2003 -0.964128413
+#  2004 -0.061124277
+#  2005  0.333005668
+#  2006 -0.337644021
+#  2007 -0.287244028
+#  2008 -0.315315045
+#  2009 -0.033125262
+#  2010 -0.005643386
+#  2011  0.110009975
+#  2012 -0.247176599
+log10(attributes(VarCorr(modF1))$sc)  # -0.3115011
+
+# plots modF0
+{
+ # fitting
+ data.f <- transform(data.f, sum.Size = log.Size+Fert)
+ counts <- table(data.f$sum.Size)
+ counts.col <- rep(1, dim(data.f)[1])
+ sub.counts <- subset(counts, counts > 1)
+ sum.sub.counts <- round(as.numeric(names(sub.counts)), 6)
+ for (i in 1:length(sum.sub.counts))
+  for (j in 1:dim(data.f)[1])
+   if (round(data.f$sum.Size[j], 6) == sum.sub.counts[i])
+    counts.col[j] <- sub.counts[i]
+ x <- seq(min(data.f$log.Size, na.rm = T), max(data.f$log.Size, na.rm = T), 0.1)
+ plot(data.f$log.Size, data.f$Fert, pch = 16, col = "grey", 
+  cex = sqrt(counts.col/pi), xlim = c(min(x), max(x)), main = "Fecundity", 
+  ylab = "Number of flowers", xlab = "log.Size", bty = "l")
+ lines(x, predict(modF0, newdata = list(log.Size = x), type = "response"), 
+  lwd = 4)
+  
+ # residuals
+ residuals <- residuals(modF0, "deviance")
+ data.f <- transform(data.f, sum.res.0 = log.Size+residuals)
+ counts <- table(data.f$sum.res.0)
+ counts.col <- rep(1, dim(data.f)[1])
+ sub.counts <- subset(counts, counts > 1)
+ sum.sub.counts <- round(as.numeric(names(sub.counts)), 6)
+ for (i in 1:length(sum.sub.counts))
+  for (j in 1:dim(data.f)[1])
+   if (round(data.f$sum.res.0[j], 6) == sum.sub.counts[i])
+    counts.col[j] <- sub.counts[i]
+ fitted <- predict(modF0, type = "response")
+ plot(fitted, residuals, ylim = c(-4, 4), pch = 16, bty = "n", col = "grey", 
+  cex = sqrt(counts.col/pi), main = "Fecundity model residuals", 
+  xlab = "scale(log10(Size))", ylab = "Deviance residuals")
+ abline(0, 0)
+}
+
+# plots modF1
+{
+ # fitting
+ data.f <- transform(data.f, sum.Size = log.Size+Fert)
+ counts <- table(data.f$sum.Size)
+ counts.col <- rep(1, dim(data.f)[1])
+ sub.counts <- subset(counts, counts > 1)
+ sum.sub.counts <- round(as.numeric(names(sub.counts)), 6)
+ for (i in 1:length(sum.sub.counts))
+  for (j in 1:dim(data.f)[1])
+   if (round(data.f$sum.Size[j], 6) == sum.sub.counts[i])
+    counts.col[j] <- sub.counts[i]
+ plot(data.f$log.Size, data.f$Fert, bty = "n", xlim = c(min(x), max(x)), 
+  main = "Fecundity", ylab = "Number of flowers", 
+  xlab = "scale(log10(Size))", col = "grey", pch = 16, 
+  cex = sqrt(counts.col/pi))
+ ranef <- ranef(modF1)$Year
+ rownames(ranef) <- as.numeric(rownames(ranef(modF1)$Year))
+ legend <- data.frame(Year = unique(data.f$Year), 
+  Year.col = rep(NA,length(unique(data.f$Year))), 
+  Year.lty = rep(NA,length(unique(data.f$Year))))
+ class(legend$Year.col) <- "character"
+ for (i in 1:length(unique(data.f$Year))) {
+  year.i <- unique(data.f$Year)[i]
+  subset <- subset(data.f, data.f$Year == year.i)
+  subset <- droplevels(subset)
+  ranef.year <- ranef[which(as.numeric(rownames(ranef)) == year.i), 1]
+  x <- seq(min(subset$log.Size), max(subset$log.Size), 0.1)
+  y <- exp(predict(modF1, newdata = list(log.Size = x), re.form = ~ 0) 
+   + ranef.year)
   legend$Year.col[i] <- as.character(subset$Year.col[1])
   legend$Year.lty[i] <- subset$Year.lty[1]
   lines(x, y, col = alpha(legend$Year.col[i], 0.5), 
